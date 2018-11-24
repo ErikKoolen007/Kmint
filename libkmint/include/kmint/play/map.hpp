@@ -13,9 +13,9 @@ public:
   map(std::istream &json_is);
 
 private:
-  ui::tile_layer foreground_layer_;
-  ui::tile_layer main_layer_;
-  ui::tile_layer background_layer_;
+  // ui::tile_layer foreground_layer_;
+  // ui::tile_layer main_layer_;
+  // ui::tile_layer background_layer_;
   graph::graph graph_{};
 };
 

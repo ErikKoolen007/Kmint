@@ -10,6 +10,7 @@ class cow : public kmint::play::map_bound_actor {
 	kmint::play::image_drawable drawable_;
 	// edge_type const *next_edge_{nullptr};
 	// edge_type const *pick_next_edge();
+	std::vector<const kmint::map::map_node*> path_;
 public:
 	cow(kmint::map::map_graph const &g, kmint::map::map_node const &initial_node);
 	// wordt elke game tick aangeroepen
@@ -19,4 +20,6 @@ public:
 	bool incorporeal() const override { return false; }
 	// geeft de radius van deze actor mee. Belangrijk voor collision detection
 	kmint::scalar radius() const override { return 16.0; }
+
+	void set_path(std::vector<const kmint::map::map_node*> path);
 };

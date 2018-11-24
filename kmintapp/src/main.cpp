@@ -12,6 +12,8 @@
 
 using namespace kmint; // alles van libkmint bevindt zich in deze namespace
 
+PriorityQueue<const kmint::map::map_node*, double> queue;
+
 const map::map_node &find_cow_node(const map::map_graph &graph) {
 	for (std::size_t i = 0; i < graph.num_nodes(); ++i) {
 		if (graph[i].node_info().kind == 'C') {
@@ -100,24 +102,33 @@ int main()
 	auto &my_hare = s.build_actor<hare>(m.graph());
 	my_hare.set_cow(my_cow);
 
-	//Tag nodes
-	/*for (std::size_t i = 0; i < graph.num_nodes(); ++i) {
-		graph[i].tagged(i % 2 == 0);
-	}*/
-
-	dijkstra dijkstra{graph};
+	dijkstra dijkstra{ graph };
 	std::map<const kmint::map::map_node*, const kmint::map::map_node*> came_from;
 	std::map<const kmint::map::map_node*, double> cost_so_far;
-	PriorityQueue<const kmint::map::map_node*, double> shortest_dijkstra_path = dijkstra.dijkstra_search(
-		my_cow.node(), my_hare.node(), came_from, cost_so_far);
 
-	//TODO uncomment to see dijkstra path
-	/*graph.untag_all();
-	while (!shortest_dijkstra_path.empty())
+	//dijkstra search
+	//dijkstra.dijkstra_search(my_cow.node(), my_hare.node(), came_from, cost_so_far);
+
+	//A* search
+	dijkstra.a_star_search(my_cow.node(), my_hare.node(), came_from, cost_so_far);
+	std::vector<const map::map_node*> path = dijkstra.reconstruct_path(std::addressof(my_cow.node()), std::addressof(my_hare.node()), came_from);
+
+	//tag shortest path
+	graph.untag_all();
+
+	for(auto node : path)
 	{
-		graph[shortest_dijkstra_path.get()->node_id()].tagged(true);
-	}*/
-	
+		graph[node->node_id()].tagged(true);
+	}
+
+	path.erase(path.begin());
+	my_cow.set_path(path);
+
+	//movement (broke)
+	// if (!path.empty())
+	// {
+	// 	my_cow.act(dt, path);
+	// }
 
 	// main_loop stuurt alle actors aan.
 	main_loop(s, window, [&](delta_time dt, loop_controls& ctl)
@@ -126,7 +137,6 @@ int main()
 		// sinds de vorige keer dat deze lambda werd aangeroepen
 		// loop controls is een object met eigenschappen die je kunt gebruiken om de
 		// main-loop aan te sturen.
-
 		for (ui::events::event& e : event_source)
 		{
 			// event heeft een methjode handle_quit die controleert
@@ -134,6 +144,7 @@ int main()
 			// de meegegeven functie (of lambda) aanroept om met het
 			// bijbehorende quit_event
 			//
+
 			e.handle_quit([&ctl](ui::events::quit_event qe) { ctl.quit = true; });
 			e.handle_key_up([&my_actor](ui::events::key_event k)
 			{
@@ -158,3 +169,6 @@ int main()
 		}
 	});
 }
+
+
+
