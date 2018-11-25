@@ -2,6 +2,10 @@
 #include "kmint/map/map.hpp"
 #include "kmint/play.hpp"
 #include "kmint/primitives.hpp"
+#include <queue>
+#include "dijkstra.h"
+
+class hare;
 
 class cow : public kmint::play::map_bound_actor {
 	// hoeveel tijd is verstreken sinds de laatste beweging
@@ -10,9 +14,12 @@ class cow : public kmint::play::map_bound_actor {
 	kmint::play::image_drawable drawable_;
 	// edge_type const *next_edge_{nullptr};
 	// edge_type const *pick_next_edge();
-	std::vector<const kmint::map::map_node*> path_;
+	std::queue<const kmint::map::map_node*> path_;
+	const kmint::map::map_node* hare_location_;
+	dijkstra* dijkstra_;
+	void set_path();
 public:
-	cow(kmint::map::map_graph const &g, kmint::map::map_node const &initial_node);
+	cow(kmint::map::map_graph const &g, kmint::map::map_node const &initial_node, dijkstra& dijkstra);
 	// wordt elke game tick aangeroepen
 	void act(kmint::delta_time dt) override;
 	kmint::ui::drawable const &drawable() const override { return drawable_; }
@@ -20,6 +27,5 @@ public:
 	bool incorporeal() const override { return false; }
 	// geeft de radius van deze actor mee. Belangrijk voor collision detection
 	kmint::scalar radius() const override { return 16.0; }
-
-	void set_path(std::vector<const kmint::map::map_node*> path);
+	void set_hare_location( const kmint::map::map_node& hare_location) { hare_location_ = &hare_location; }
 };

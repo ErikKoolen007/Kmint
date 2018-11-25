@@ -28,6 +28,7 @@ void hare::act(kmint::delta_time dt) {
 		auto &a = colliding_actor(i);
 		if (&a == cow_) {
 			node(random_hare_node(graph()));
+			cow_->set_hare_location(node());
 		}
 	}
 }
